@@ -1,0 +1,12 @@
+templates:
+  - manifest.yaml
+
+providers:
+  # Default provider config (not needed)
+  default:
+    key_path: .konverter-vault
+
+context:
+  - vars/prod.yaml
+  - provider: default
+    path: vars/common.yaml

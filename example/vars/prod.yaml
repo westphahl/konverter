@@ -1,0 +1,4 @@
+environment: production
+webapp:
+  secret_key: "secret-key"
+  server_name: "foobar.example.com"

@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dockerhub-registry-auth
+data:
+  .dockerconfigjson: !k/expr dockerhub_configjson | to_json | b64encode
+type: kubernetes.io/dockerconfigjson
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-config
+type: Opaque
+stringData:
+  appsecrets: !k/expr webapp.secret_key
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  annotations:
+    environment: !k/expr environment
+data:
+  nginx.conf: !k/template |-
+    gzip on;
+
+    upstream webapp {
+        server localhost:3031;
+    }
+
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name {{ webapp.server_name }};
+        charset utf-8;
+
+        # max upload size
+        client_max_body_size 100M;
+
+        location / {
+            # max upload size (needs to be here aswell)
+            client_max_body_size 100M;
+
+            uwsgi_pass  webapp;
+            include     uwsgi_params;
+        }
+
+        location /media  {
+            if ($arg_download) {
+                add_header Content-Disposition attachment;
+            }
+
+            location ~* \.(eot|ttf|woff|woff2)$ {
+                add_header Access-Control-Allow-Origin *;
+            }
+
+            alias /usr/share/nginx/media;
+        }
+
+        location /static {
+            alias /usr/share/nginx/static;
+        }
+    }
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: webapp
+spec:
+  selector:
+    app: webapp
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: webapp-ingress
+spec:
+  rules:
+    - host: !k/expr webapp.server_name
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: webapp
+              servicePort: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  labels:
+    app: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+        - name: webapp
+          image: myrepo/webapp:latest
+          ports:
+            - containerPort: 3031
+          volumeMounts:
+            - name: webapp-config
+              mountPath: "/etc/secrets"
+              readOnly: true
+        - name: nginx
+          image: nginx:1.16.1
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: "/etc/nginx/conf.d/default.conf"
+              subPath: "default.conf"
+      imagePullSecrets:
+        - name: dockerhub-registry-auth
+      volumes:
+        - name: webapp-config
+          secret:
+            secretName: webapp-config
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+            items:
+              - key: nginx.conf
+                path: default.conf

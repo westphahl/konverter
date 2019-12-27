@@ -1,0 +1,7 @@
+environment: default
+dockerhub_configjson:
+  auths:
+    https://index.docker.io/v1/:
+      auth: !k/vault gAAAAABeH1x5MPsy-u0JlAFwfABnbXZSirHWjtt77iCCilTGa90odDSI8ybClUaUe3tCDQhrm7YoWYJLUfgoBmUSkCYL1FvmKw==
+    https://other.registry.com/:
+      auth: !k/encrypt unencrypted
