@@ -1,0 +1,6 @@
+templates:
+  - templates/dir_and_file/dir
+  - templates/dir_and_file/two.yaml
+
+context:
+  - vars/_generic.yaml

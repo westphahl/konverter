@@ -1,0 +1,3 @@
+variable: !k/expr foobar
+VARIABLE: !k/expr foobar|upper
+b64_variable: !k/expr foobar|b64encode

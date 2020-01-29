@@ -1,0 +1,11 @@
+---
+json_variable: '{"number": 42, "other": "FOOBAR"}'
+
+template: |-
+  Hello World!
+
+  42
+---
+variable: Hello World!
+VARIABLE: HELLO WORLD!
+b64_variable: SGVsbG8gV29ybGQh

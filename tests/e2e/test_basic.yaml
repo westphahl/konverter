@@ -1,0 +1,5 @@
+templates:
+  - templates/basic.yaml
+
+context:
+  - vars/_generic.yaml

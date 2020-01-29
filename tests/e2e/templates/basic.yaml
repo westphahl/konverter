@@ -1,0 +1,9 @@
+variable: !k/expr foobar
+VARIABLE: !k/expr foobar|upper
+b64_variable: !k/expr foobar|b64encode
+json_variable: !k/expr object|to_json
+
+template: !k/template |-
+  {{ foobar }}
+
+  {{ object.number }}

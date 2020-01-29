@@ -1,0 +1,2 @@
+encrypted_foobar: !k/vault gAAAAABeMdtcuKywSJfQo4b0fFDX0PC3ZGoKWGr3cRgl64bjx8taTlV-jAxlcX9AW3x2E5bx5OkYhQbvW8TRUcnxqtefneNirA==
+unencrypted_barfoo: !k/encrypt Hello unencryted secret!

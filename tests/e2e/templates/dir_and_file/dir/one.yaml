@@ -1,0 +1,6 @@
+json_variable: !k/expr object|to_json
+
+template: !k/template |-
+  {{ foobar }}
+
+  {{ object.number }}

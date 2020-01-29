@@ -1,0 +1,9 @@
+templates:
+  - templates/encrypted.yaml
+
+providers:
+  default:
+    key_path: .konverter-vault-test
+
+context:
+  - vars/_encrypted.yaml

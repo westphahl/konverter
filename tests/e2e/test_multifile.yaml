@@ -1,0 +1,6 @@
+templates:
+  - templates/multifile/one.yaml
+  - templates/multifile/two.yaml
+
+context:
+  - vars/_generic.yaml

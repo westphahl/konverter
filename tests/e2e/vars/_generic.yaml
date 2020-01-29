@@ -1,0 +1,5 @@
+foobar: Hello World!
+
+object:
+  number: 42
+  other: FOOBAR

@@ -1,0 +1,2 @@
+encrypted_value: !k/expr encrypted_foobar
+unencrypted_value: !k/expr unencrypted_barfoo

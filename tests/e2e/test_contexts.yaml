@@ -1,0 +1,6 @@
+templates:
+  - templates/contexts.yaml
+
+context:
+  - vars/contexts.yaml
+  - vars/_generic.yaml

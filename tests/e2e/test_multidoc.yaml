@@ -1,0 +1,5 @@
+templates:
+  - templates/multidoc.yaml
+
+context:
+  - vars/_generic.yaml
