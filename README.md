@@ -99,7 +99,7 @@ foo:
   foo: !k/expr value.from.other|upper
 ```
 
-When using the `!k/expr` tag, the value you can be any valid [Jinja2 expression](https://jinja.palletsprojects.com/en/2.10.x/templates/#expressions). In addition to the standard Jinja [filters](https://jinja.palletsprojects.com/en/2.10.x/templates/#list-of-builtin-filters), [tests](https://jinja.palletsprojects.com/en/2.10.x/templates/#list-of-builtin-tests) and [global functions](https://jinja.palletsprojects.com/en/2.10.x/templates/#list-of-global-functions) the following filters are currently available:
+When using the `!k/expr` tag, the value can be any valid [Jinja2 expression](https://jinja.palletsprojects.com/en/2.10.x/templates/#expressions). In addition to the standard Jinja [filters](https://jinja.palletsprojects.com/en/2.10.x/templates/#list-of-builtin-filters), [tests](https://jinja.palletsprojects.com/en/2.10.x/templates/#list-of-builtin-tests) and [global functions](https://jinja.palletsprojects.com/en/2.10.x/templates/#list-of-global-functions) the following filters are currently available:
 
 - `to_json`: dump an object as a *JSON string*
 - `b64encode`: encode value using Base64
