@@ -1,4 +1,4 @@
-# Konverter - YAML templating for responsibe users
+# Konverter - YAML templating for responsible users
 
 Konverter is a YAML templating tool that uses Jinja [expression](https://jinja.palletsprojects.com/en/2.10.x/templates/#expressions) and [templates](https://jinja.palletsprojects.com/en/2.10.x/templates/) and supports inline-encrypted variables.
 
