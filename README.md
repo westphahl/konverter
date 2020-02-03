@@ -57,7 +57,7 @@ $ konverter production.yaml
 The rendered templates will be written to `stdout` as a multi-document YAML. This allows for easy composition with other tools like `kubectl`:
 
 ```shell
-$ konverter production.yaml | kubectl -f -
+$ konverter production.yaml | kubectl apply -f -
 ```
 
 ### Templates
