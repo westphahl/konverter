@@ -12,5 +12,5 @@
 Initial release
 
 [unreleased]: https://github.com/westphahl/konverter/compare/v0.1.1...HEAD
-[v0.1.1]: https://github.com/westphahl/konverter/releases/tag/v0.1.0...v0.1.1
+[v0.1.1]: https://github.com/westphahl/konverter/compare/v0.1.0...v0.1.1
 [v0.1.0]: https://github.com/westphahl/konverter/releases/tag/v0.1.0
