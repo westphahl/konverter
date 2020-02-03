@@ -15,10 +15,10 @@ cryptography = "^2.8"
 "ruamel.yaml" = "^0.16.5"
 click = "^7.0"
 jinja2 = "^2.10.3"
-mypy = "^0.761"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
+mypy = "^0.761"
 pytest = "^5.3.2"
 flake8 = "^3.7.9"
 flake8-bugbear = "^20.1.2"
