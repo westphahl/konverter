@@ -99,6 +99,10 @@ metadata:
   name: webapp-deployment
   labels:
     app: webapp
+  annotations:
+    deploy_user: !k/expr current_user()
+    deployded_as_root: !k/expr current_user() is root
+    user_foo: !k/expr current_user() | fooify
 spec:
   replicas: 1
   selector:

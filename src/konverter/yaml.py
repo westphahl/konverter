@@ -13,6 +13,8 @@ from ruamel.yaml.representer import RoundTripRepresenter
 from .template import JinjaEnvironment
 
 if typing.TYPE_CHECKING:
+    import types
+
     from ruamel.yaml.nodes import Node, ScalarNode
     from ruamel.yaml.constructor import Constructor
     from ruamel.yaml.representer import Representer
@@ -101,10 +103,15 @@ class KonvertTemplate(KonvertType):
 
 
 class KonverterYAML(BaseYAML):
-    def __init__(self, app: Konverter):
+    def __init__(
+        self,
+        app: Konverter,
+        plugins: typing.Optional[typing.List[types.ModuleType]] = None,
+    ):
         super().__init__()
+        # FIXME: only pass the context and not the whole app
         self.app = app
-        self.env = JinjaEnvironment(undefined=jinja2.StrictUndefined)
+        self.env = JinjaEnvironment(plugins=plugins, undefined=jinja2.StrictUndefined)
         self.register_type(KonvertExpression)
         self.register_type(KonvertTemplate)
 

@@ -1,0 +1,8 @@
+---
+global: test
+filter: TEST
+test: true
+template: |-
+  test
+  TEST
+  True
