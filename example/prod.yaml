@@ -10,3 +10,6 @@ context:
   - vars/prod.yaml
   - provider: default
     path: vars/common.yaml
+
+template_plugins:
+  - example_plugin

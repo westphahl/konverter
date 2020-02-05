@@ -1,0 +1,7 @@
+global: !k/expr template_global()
+filter: !k/expr template_global() | template_filter
+test: !k/expr template_global() is template_test
+template: !k/template |-
+  {{ template_global() }}
+  {{ template_global() | template_filter }}
+  {{ template_global() is template_test }}

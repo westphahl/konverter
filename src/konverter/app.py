@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 import collections
+import importlib
 import pathlib
+import sys
 import typing
 
 from ruamel.yaml import YAML
@@ -7,19 +11,23 @@ from ruamel.yaml import YAML
 from .context import ContextProvider
 from .yaml import KonverterYAML
 
+if typing.TYPE_CHECKING:
+    import types
+
 DEFAULT_PROVIDER = {
     "default": {"key_path": ".konverter-vault",},
 }
 
 
 class Konverter:
-    def __init__(self, templates, context, work_dir):
+    def __init__(self, templates, template_plugins, context, work_dir):
         self.templates = templates
+        self.template_plugins = template_plugins
         self.context = context
         self.work_dir = work_dir
 
     def render(self, out_file):
-        yaml = KonverterYAML(self)
+        yaml = KonverterYAML(self, self.template_plugins)
         # We want to have the documents from different files
         # separated by "---".
         yaml.explicit_start = True
@@ -44,6 +52,9 @@ class Konverter:
                 (pathlib.Path(p) for p in config["templates"]), work_dir
             )
         )
+        template_plugins = list(
+            cls._load_template_plugins(config.get("template_plugins", []), work_dir)
+        )
         providers = dict(
             cls._create_providers(
                 collections.ChainMap(config.get("providers", {}), DEFAULT_PROVIDER),
@@ -51,7 +62,7 @@ class Konverter:
             )
         )
         context = collections.ChainMap(*cls._load_context(config["context"], providers))
-        return cls(templates, context, work_dir)
+        return cls(templates, template_plugins, context, work_dir)
 
     @staticmethod
     def _collect_templates(
@@ -84,3 +95,13 @@ class Konverter:
             else:
                 provider, path = ctx["provider"], ctx["path"]
             yield providers[provider].load_context(path)
+
+    @staticmethod
+    def _load_template_plugins(
+        plugin_names: typing.List[str], work_dir: pathlib.Path
+    ) -> typing.Generator[types.ModuleType, None, None]:
+        path = str(work_dir)
+        if path not in sys.path:
+            sys.path.append(path)
+        for module_name in plugin_names:
+            yield importlib.import_module(module_name)

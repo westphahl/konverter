@@ -1,0 +1,8 @@
+templates:
+  - templates/plugin.yaml
+
+context:
+  - vars/_generic.yaml
+
+template_plugins:
+  - template_plugin
