@@ -112,7 +112,7 @@ The `!k/template` tag supports the full [Jinja2 template syntax](https://jinja.p
 
 ### Context
 
-The `context` key in the config contains a list of files that Konverter loads as variable definitions for rendering templates. In the case of multiple context files contain the same top-level key, the entry from the last listed file wins (in the future we might support merging those contexts).
+The `context` key in the config contains a list of files or directories that Konverter uses for loading variable definitions. Those variables serve as the context (hence the name) when rendering templates. In the case of multiple context files containing the same top-level key, the entry from the last listed file wins (in the future we might support merging those contexts).
 
 This is how a simple context file might look like
 ```yaml
@@ -187,7 +187,8 @@ providers:
     key_path: .konverter-vault
 
 context:
-  - vars/common.yaml
+  - provider: default
+    path: vars/common.yaml
   - provider: default
     path: vars/prod.yaml
 ```
