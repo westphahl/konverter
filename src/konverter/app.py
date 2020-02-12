@@ -50,7 +50,9 @@ class Konverter:
                 work_dir,
             )
         )
-        context = collections.ChainMap(*cls._load_context(config["context"], providers))
+        context = collections.ChainMap(
+            *cls._load_context(config["context"], providers, work_dir)
+        )
         return cls(templates, context, work_dir)
 
     @staticmethod
@@ -77,10 +79,15 @@ class Konverter:
             )
 
     @staticmethod
-    def _load_context(context, providers):
+    def _load_context(context, providers, work_dir: pathlib.Path):
         for ctx in context:
             if isinstance(ctx, str):
-                provider, path = "default", ctx
+                provider, context_path = "default", ctx
             else:
-                provider, path = ctx["provider"], ctx["path"]
-            yield providers[provider].load_context(path)
+                provider, context_path = ctx["provider"], ctx["path"]
+            path = work_dir / context_path
+            if path.is_file():
+                yield providers[provider].load_context(path)
+            elif path.is_dir():
+                for file_path in sorted(path.glob("**/*.y[a]ml")):
+                    yield providers[provider].load_context(file_path)
