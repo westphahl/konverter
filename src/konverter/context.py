@@ -61,5 +61,5 @@ class ContextProvider:
         return self._fernet
 
     def load_context(self, path: pathlib.Path) -> typing.Mapping[str, typing.Any]:
-        with open(self.work_dir / path) as yaml_file:
+        with open(path) as yaml_file:
             return ContextYAML(self).load(yaml_file)

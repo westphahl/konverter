@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Added support for directories as context path
+
 ## [v0.1.1] - 2020-02-03
 
 - Removed mypy as a runtime dependency ([#1](https://github.com/westphahl/konverter/issues/1))

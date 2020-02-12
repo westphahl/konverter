@@ -1,0 +1,12 @@
+---
+variable: Hello World!
+VARIABLE: HELLO WORLD!
+b64_variable: SGVsbG8gV29ybGQh
+json_variable: '{"number": 43, "other": "BARFOO"}'
+
+template: |-
+  Hello World!
+
+  43
+
+  Hello context!
