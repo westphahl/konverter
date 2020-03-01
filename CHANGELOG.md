@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [v0.2.0] - 2020-03-01
+
 - Added support for directories as context path
 
 ## [v0.1.1] - 2020-02-03
@@ -13,6 +15,7 @@
 
 Initial release
 
-[unreleased]: https://github.com/westphahl/konverter/compare/v0.1.1...HEAD
+[unreleased]: https://github.com/westphahl/konverter/compare/v0.2.0...HEAD
+[v0.2.0]: https://github.com/westphahl/konverter/compare/v0.1.1...v0.2.0
 [v0.1.1]: https://github.com/westphahl/konverter/compare/v0.1.0...v0.1.1
 [v0.1.0]: https://github.com/westphahl/konverter/releases/tag/v0.1.0
