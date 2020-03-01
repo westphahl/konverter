@@ -22,7 +22,7 @@ class Konverter:
         yaml = KonverterYAML(self)
         # We want to have the documents from different files
         # separated by "---".
-        yaml.explicit_start = True
+        yaml.explicit_start = True  # type: ignore
         for template_path in self.templates:
             with open(template_path) as template:
                 yaml.render(template, out_file)
@@ -57,7 +57,8 @@ class Konverter:
 
     @staticmethod
     def _collect_templates(
-        templates: typing.List[str], work_dir: pathlib.Path
+        templates: typing.Iterable[typing.Union[str, pathlib.Path]],
+        work_dir: pathlib.Path,
     ) -> typing.Generator[pathlib.Path, None, None]:
         for template_path in templates:
             path = work_dir / template_path
