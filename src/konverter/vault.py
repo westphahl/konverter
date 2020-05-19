@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import pathlib
 import shutil
 import tempfile
@@ -215,6 +216,29 @@ def edit(ctx: click.Context, file_path: str):
                     err=True,
                     abort=True,
                 )
+
+
+@cli.command()
+@click.argument("file_path", type=click.Path(exists=True, dir_okay=False))
+@click.option(
+    "-f",
+    "--format",
+    "output_format",
+    type=click.Choice(["yaml", "json"], case_sensitive=False),
+    default="yaml",
+)
+@click.pass_context
+def show(ctx: click.Context, file_path: str, output_format: str):
+    fernet = ctx.obj["fernet"]
+
+    encrypt_yaml = VaultToPlainYAML(fernet)
+    with open(file_path, "r+") as yaml_file:
+        with click.open_file("-", "wt") as stdout:
+            data = encrypt_yaml.load(yaml_file)
+            if output_format == "json":
+                json.dump(data, stdout, indent=2)
+            else:
+                encrypt_yaml.dump(data, stdout)
 
 
 if __name__ == "__main__":
