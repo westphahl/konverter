@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+- Added a `konverter-vault show` command that supports YAML and JSON output
+- Added support for `terraform` output format in `konverter-vault show` command
+  that allows using it as an [external data source in
+  Terraform](https://www.terraform.io/docs/providers/external/data_source.html).
+
 ## [v0.2.0] - 2020-03-01
 
 - Added support for directories as context path
