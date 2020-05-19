@@ -149,7 +149,7 @@ def keygen(ctx: click.Context) -> None:
     key_path = ctx.obj["key_path"]
     if pathlib.Path(key_path).exists():
         click.confirm(
-            f"Key exists! Overwrite with new key?", default=False, err=True, abort=True,
+            "Key exists! Overwrite with new key?", default=False, err=True, abort=True,
         )
     with open(key_path, "wb") as key_file:
         key_file.write(Fernet.generate_key())
@@ -209,9 +209,9 @@ def edit(ctx: click.Context, file_path: str):
                     shutil.copy(out_tmp.name, file_path)
                 break
             except Exception:
-                click.echo(f"Failed to load and encrypt file!", err=True)
+                click.echo("Failed to load and encrypt file!", err=True)
                 click.confirm(
-                    f"Continue editing? (if not, changes will be lost)",
+                    "Continue editing? (if not, changes will be lost)",
                     default=True,
                     err=True,
                     abort=True,
