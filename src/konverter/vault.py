@@ -7,11 +7,12 @@ import typing
 
 import click
 from cryptography.fernet import Fernet
+from ruamel.yaml.nodes import ScalarNode
 
 from .yaml import BaseYAML, KonvertType
 
 if typing.TYPE_CHECKING:
-    from ruamel.yaml.nodes import ScalarNode
+    from ruamel.yaml.constructor import Constructor
     from ruamel.yaml.representer import Representer
 
 DEFAULT_VAULT_KEY_PATH = ".konverter-vault"
@@ -47,30 +48,77 @@ class KonvertVault(KonvertType):
         )
 
 
-class DecryptYAML(BaseYAML):
-    def __init__(self, fernet: Fernet):
+class KonvertVaultValue(KonvertVault):
+    @classmethod
+    def from_yaml(cls, constructor: Constructor, node: ScalarNode, yaml) -> ScalarNode:
+        value = yaml.fernet.decrypt(bytes(node.value, encoding="utf8"))
+        return constructor.construct_scalar(
+            ScalarNode(
+                tag="tag:yaml.org,2002:str",
+                value=str(value, encoding="utf8"),
+                style=node.style,
+            )
+        )
+
+
+class KonvertEncryptValue(KonvertEncrypt):
+    @classmethod
+    def from_yaml(cls, constructor: Constructor, node: ScalarNode, yaml) -> ScalarNode:
+        return constructor.construct_scalar(
+            ScalarNode(tag="tag:yaml.org,2002:str", value=node.value, style=node.style)
+        )
+
+
+class VaultYAML(BaseYAML):
+    def __init__(self, fernet: typing.Callable[[], Fernet]):
         super().__init__()
-        self.fernet = fernet
+        if isinstance(fernet, Fernet):
+            self.fernet: Fernet = fernet
+        else:
+            self._lazy_fernet = fernet
+
+    def __getattr__(self, name):
+        if name == "fernet":
+            self.fernet = self._lazy_fernet()
+            return self.fernet
+        raise AttributeError(name)
+
+
+class VaultToEditableYAML(VaultYAML):
+    def __init__(self, fernet: typing.Callable[[], Fernet]):
+        super().__init__(fernet)
         self.register_type(KonvertVault)
 
-    def decrypt(self, encrypted: typing.IO[str], decrypted: typing.IO[str]) -> None:
-        data = self.load(encrypted)
+    def convert(self, vault: typing.IO[str], decrypted: typing.IO[str]) -> None:
+        data = self.load(vault)
         if data is None:
             return
         self.dump(data, stream=decrypted)
 
 
-class EncryptYAML(BaseYAML):
-    def __init__(self, fernet: Fernet):
-        super().__init__()
-        self.fernet = fernet
+class EditableToVaultYAML(VaultYAML):
+    def __init__(self, fernet: typing.Callable[[], Fernet]):
+        super().__init__(fernet)
         self.register_type(KonvertEncrypt)
 
-    def encrypt(self, decrypted: typing.IO[str], encrypted: typing.IO[str]) -> None:
+    def convert(self, decrypted: typing.IO[str], vault: typing.IO[str]) -> None:
         data = self.load(decrypted)
         if data is None:
             return
-        self.dump(data, stream=encrypted)
+        self.dump(data, stream=vault)
+
+
+class VaultToPlainYAML(VaultYAML):
+    def __init__(self, fernet: typing.Callable[[], Fernet]):
+        super().__init__(fernet)
+        self.register_type(KonvertEncryptValue)
+        self.register_type(KonvertVaultValue)
+
+    def convert(self, encrypted: typing.IO[str], plain: typing.IO[str]) -> None:
+        data = self.load(encrypted)
+        if data is None:
+            return
+        self.dump(data, stream=plain)
 
 
 def key_from_file(key_path: typing.Union[str, pathlib.Path]) -> bytes:
@@ -112,10 +160,10 @@ def keygen(ctx: click.Context) -> None:
 def encrypt(ctx: click.Context, file_path: str):
     fernet = ctx.obj["fernet"]
 
-    encrypt_yaml = EncryptYAML(fernet)
+    encrypt_yaml = EditableToVaultYAML(fernet)
     with tempfile.NamedTemporaryFile(mode="wt", suffix=".yaml") as tmp_file:
         with open(file_path, "r") as yaml_file:
-            encrypt_yaml.encrypt(yaml_file, tmp_file)
+            encrypt_yaml.convert(yaml_file, tmp_file)
 
         tmp_file.flush()
         shutil.copy(tmp_file.name, file_path)
@@ -127,10 +175,10 @@ def encrypt(ctx: click.Context, file_path: str):
 def decrypt(ctx: click.Context, file_path: str):
     fernet = ctx.obj["fernet"]
 
-    decrypt_yaml = DecryptYAML(fernet)
+    decrypt_yaml = VaultToEditableYAML(fernet)
     with tempfile.NamedTemporaryFile(mode="wt", suffix=".yaml") as tmp_file:
         with open(file_path, "r") as yaml_file:
-            decrypt_yaml.decrypt(yaml_file, tmp_file)
+            decrypt_yaml.convert(yaml_file, tmp_file)
 
         tmp_file.flush()
         shutil.copy(tmp_file.name, file_path)
@@ -142,10 +190,10 @@ def decrypt(ctx: click.Context, file_path: str):
 def edit(ctx: click.Context, file_path: str):
     fernet = ctx.obj["fernet"]
 
-    decrypt_yaml = DecryptYAML(fernet)
+    decrypt_yaml = VaultToEditableYAML(fernet)
     with tempfile.NamedTemporaryFile(mode="w+t", suffix=".yaml") as tmp_file:
         with open(file_path, "r+") as yaml_file:
-            decrypt_yaml.decrypt(yaml_file, tmp_file)
+            decrypt_yaml.convert(yaml_file, tmp_file)
         tmp_file.flush()
 
         while True:
@@ -153,9 +201,9 @@ def edit(ctx: click.Context, file_path: str):
             tmp_file.flush()
             tmp_file.seek(0)
             try:
-                encrypt_yaml = EncryptYAML(fernet)
+                encrypt_yaml = EditableToVaultYAML(fernet)
                 with tempfile.NamedTemporaryFile(mode="wt") as out_tmp:
-                    encrypt_yaml.encrypt(tmp_file, out_tmp)
+                    encrypt_yaml.convert(tmp_file, out_tmp)
                     out_tmp.flush()
                     shutil.copy(out_tmp.name, file_path)
                 break
