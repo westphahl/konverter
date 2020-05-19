@@ -218,13 +218,24 @@ def edit(ctx: click.Context, file_path: str):
                 )
 
 
+def to_terraform_format(data: dict) -> dict:
+    def _convert(v):
+        if isinstance(v, str):
+            return v
+        if isinstance(v, (float, int, bool)):
+            return str(v)
+        raise TypeError("Terraform JSON output only supports string values")
+
+    return {k: _convert(v) for k, v in data.items() if v is not None}
+
+
 @cli.command()
 @click.argument("file_path", type=click.Path(exists=True, dir_okay=False))
 @click.option(
     "-f",
     "--format",
     "output_format",
-    type=click.Choice(["yaml", "json"], case_sensitive=False),
+    type=click.Choice(["yaml", "json", "terraform"], case_sensitive=False),
     default="yaml",
 )
 @click.pass_context
@@ -237,6 +248,8 @@ def show(ctx: click.Context, file_path: str, output_format: str):
             data = encrypt_yaml.load(yaml_file)
             if output_format == "json":
                 json.dump(data, stdout, indent=2)
+            elif output_format == "terraform":
+                json.dump(to_terraform_format(data), stdout, indent=2)
             else:
                 encrypt_yaml.dump(data, stdout)
 
