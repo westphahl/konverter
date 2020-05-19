@@ -174,6 +174,40 @@ $ konverter-vault encrypt vars/secret.yaml
 $ konverter-vault decrypt vars/secret.yaml
 ```
 
+In case the decrypted content should be passed to another tool that expects
+YAML or JSON, the `konverter-vault show` command can come in handy:
+
+```shell
+$ konverter-vault show --format=json vars/secret.yaml
+{
+  "credentials": {
+    "user": "root",
+    "password": "secret-password"
+  }
+}
+```
+
+It will decrypt the given file and remove all `!k/(encrypt|vault)` YAML tags.
+Supported output formats are `yaml` (default), `json` or `terraform`.
+
+The `terraform` output format is usefull for using `konverter-vault` as an
+[external data source in
+Terraform](https://www.terraform.io/docs/providers/external/data_source.html)
+
+```hcl
+data "external" "konverter" {
+  program = [
+    "konverter-vault", "show", "--format=terraform", "vars/secrets.yaml"
+  ]
+}
+```
+
+Unfortunately the "[external program
+protocol](https://www.terraform.io/docs/providers/external/data_source.html#external-program-protocol)"
+only allows string values (no lists or objects). All `float`, `int` and `bool`
+values will be converted to strings. Other types will cause an error when
+using this output format.
+
 ### Advanced configuration
 
 The above config file could be rewritten in a more verbose format:
