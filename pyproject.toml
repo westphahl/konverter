@@ -49,3 +49,14 @@ exclude = '''
 [build-system]
 requires = ["poetry>=0.12", "setuptools"]
 build-backend = "poetry.masonry.api"
+
+[project]
+name = "konverter"
+version = "0.4.0"
+description = "YAML templating for responsible users"
+readme = "README.md"
+keywords = ["yaml", "template", "kubernetes"]
+
+[project.scripts]
+konverter = "konverter.__main__:cli"
+konverter-vault = "konverter.vault:cli"
